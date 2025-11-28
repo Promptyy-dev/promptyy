@@ -27,6 +27,25 @@
             overflow: hidden;
             margin: 0;
             padding: 0;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(74, 158, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.02) 49%, rgba(255, 255, 255, 0.02) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(255, 255, 255, 0.02) 49%, rgba(255, 255, 255, 0.02) 51%, transparent 52%);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            background-position: 0 0, 0 0, 0 0, 0 0;
+            pointer-events: none;
+            z-index: 1;
         }
         
         /* Mobile responsive styles */
@@ -75,6 +94,8 @@
             display: flex;
             height: 100vh;
             width: 100vw;
+            position: relative;
+            z-index: 2;
         }
         
         /* Left Side - Product Details */
@@ -88,6 +109,37 @@
             text-align: center;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             max-width: 70vw;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-section::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: -100px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(74, 158, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .product-section::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: -100px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
         
         .product-logo {
@@ -99,19 +151,25 @@
         }
         
         .product-title {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 700;
             color: #ffffff;
             margin-bottom: 16px;
-            line-height: 1.1;
+            line-height: 1.2;
+            position: relative;
+            z-index: 2;
+            letter-spacing: -0.3px;
         }
         
         .product-subtitle {
-            font-size: 16px;
+            font-size: 14px;
             color: #cccccc;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             line-height: 1.5;
-            max-width: 500px;
+            max-width: 450px;
+            position: relative;
+            z-index: 2;
+            font-weight: 400;
         }
         
         .product-cta {
@@ -140,22 +198,33 @@
             display: flex;
             align-items: flex-start;
             margin-bottom: 12px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(5px);
         }
         
         .usefulness-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(4px);
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-color: rgba(74, 158, 255, 0.2);
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.1);
         }
         
         .usefulness-icon {
-            font-size: 16px;
-            margin-right: 10px;
+            font-size: 18px;
+            margin-right: 12px;
             margin-top: 2px;
+            transition: transform 0.3s ease;
+        }
+        
+        .usefulness-item:hover .usefulness-icon {
+            transform: scale(1.2);
         }
         
         .usefulness-text {
@@ -163,6 +232,7 @@
             color: #cccccc;
             line-height: 1.4;
             font-size: 14px;
+            font-weight: 400;
         }
         
         .product-cta {
@@ -171,25 +241,44 @@
         
         .cta-button {
             display: inline-block;
-            background: rgba(74, 158, 255, 0.15);
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.2) 0%, rgba(74, 158, 255, 0.1) 100%);
             color: #4a9eff;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
             font-size: 14px;
             letter-spacing: 0.5px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(74, 158, 255, 0.3);
             cursor: pointer;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
         }
         
         .cta-button:hover {
-            background: rgba(74, 158, 255, 0.25);
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.3) 0%, rgba(74, 158, 255, 0.2) 100%);
             color: #6ab7ff;
             border-color: rgba(74, 158, 255, 0.5);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 158, 255, 0.3);
         }
         
         /* Right Side - Blog Section */
@@ -198,33 +287,38 @@
             padding: 40px;
             display: flex;
             flex-direction: column;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(5px);
             max-width: 30vw;
             overflow-y: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         /* Custom Scrollbar - only show when needed */
         .blog-section::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         
         .blog-section::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            margin: 10px 0;
         }
         
         .blog-section::-webkit-scrollbar-thumb {
-            background: rgba(74, 158, 255, 0.3);
-            border-radius: 3px;
-            transition: background 0.3s ease;
+            background: linear-gradient(180deg, rgba(74, 158, 255, 0.4), rgba(74, 158, 255, 0.2));
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(74, 158, 255, 0.1);
         }
         
         .blog-section::-webkit-scrollbar-thumb:hover {
-            background: rgba(74, 158, 255, 0.5);
+            background: linear-gradient(180deg, rgba(74, 158, 255, 0.6), rgba(74, 158, 255, 0.3));
+            border-color: rgba(74, 158, 255, 0.3);
         }
         
         .blog-section::-webkit-scrollbar-thumb:active {
-            background: rgba(74, 158, 255, 0.7);
+            background: linear-gradient(180deg, rgba(74, 158, 255, 0.7), rgba(74, 158, 255, 0.4));
         }
         
         /* Hide scrollbar when not scrolling */
@@ -241,13 +335,40 @@
             font-size: 20px;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        .blog-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #4a9eff, transparent);
+            border-radius: 1px;
         }
         
         .blog-teasers {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .blog-teaser {
@@ -385,13 +506,72 @@
             }
         }
         
+        /* Large desktop screens - make everything bigger */
+        @media (min-width: 1400px) {
+            .product-section {
+                padding: 60px;
+            }
+            
+            .blog-section {
+                padding: 60px;
+            }
+            
+            .product-title {
+                font-size: 48px;
+            }
+            
+            .product-subtitle {
+                font-size: 20px;
+                max-width: 650px;
+            }
+            
+            .product-image {
+                max-width: 450px;
+                height: 280px;
+            }
+            
+            .blog-title {
+                font-size: 24px;
+            }
+            
+            .blog-teaser {
+                padding: 30px;
+            }
+            
+            .blog-headline {
+                font-size: 20px;
+            }
+            
+            .blog-excerpt {
+                font-size: 15px;
+            }
+            
+            .blog-tag {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            
+            .usefulness-item {
+                padding: 15px;
+            }
+            
+            .usefulness-text {
+                font-size: 15px;
+            }
+        }
+        
         @media (max-width: 480px) {
             .product-section {
                 padding: 30px 15px;
             }
             
-            .blog-section {
-                padding: 30px 15px;
+            .product-section {
+                padding: 40px 20px;
+            }
+            
+            .product-image {
+                max-width: 300px;
+                height: 200px;
             }
             
             .product-title {

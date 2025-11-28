@@ -1,6 +1,153 @@
 // Main JavaScript functionality for Prompty UI
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Local Storage Functions
+    function saveCardsToStorage() {
+        const cards = document.querySelectorAll('.resizable-card');
+        const cardsData = [];
+        
+        cards.forEach(card => {
+            const contentArea = card.querySelector('.content-area');
+            cardsData.push({
+                id: card.dataset.cardId || Date.now().toString(),
+                left: card.style.left,
+                top: card.style.top,
+                width: card.style.width,
+                height: card.style.height,
+                content: contentArea ? contentArea.innerHTML : '',
+                color: card.style.backgroundColor || ''
+            });
+        });
+        
+        localStorage.setItem('promptyy_cards', JSON.stringify(cardsData));
+    }
+    
+    function loadCardsFromStorage() {
+        const savedCards = localStorage.getItem('promptyy_cards');
+        if (savedCards) {
+            try {
+                const cardsData = JSON.parse(savedCards);
+                cardsData.forEach(cardData => {
+                    createCardFromData(cardData);
+                });
+            } catch (e) {
+                console.error('Error loading cards from storage:', e);
+            }
+        }
+    }
+    
+    function createCardFromData(cardData) {
+        const card = document.createElement('div');
+        card.className = 'resizable-card';
+        card.dataset.cardId = cardData.id;
+        card.style.left = cardData.left || '100px';
+        card.style.top = cardData.top || '100px';
+        card.style.width = cardData.width || '250px';
+        card.style.height = cardData.height || '200px';
+        card.style.position = 'absolute';
+        card.style.transform = 'none';
+        if (cardData.color) {
+            card.style.backgroundColor = cardData.color;
+        }
+        
+        card.innerHTML = `
+            <div class="card-header">
+                <div class="card-controls">
+                    <div class="control-dot color-dot" title="Change Color"></div>
+                    <div class="control-dot delete-dot" title="Delete Card"></div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-area" contenteditable="true" tabindex="0">${cardData.content || ''}</div>
+            </div>
+            <div class="resize-handle"></div>
+        `;
+        
+        canvasArea.appendChild(card);
+        initializeCardInteractions(card);
+    }
+    
+    function initializeCardInteractions(card) {
+        // Use the existing card initialization system
+        initializeResizableCard(card);
+        
+        // Add connection click handler
+        card.addEventListener('click', (e) => {
+            if (e.shiftKey) {
+                handleCardConnection(card, e);
+                return;
+            }
+            
+            if (!e.target.closest('.card-header') && !e.target.closest('.card-controls') && !e.target.closest('.resize-handle')) {
+                if (isConnectionMode || isDisconnectMode) {
+                    handleCardConnection(card, e);
+                }
+            }
+        });
+        
+        // Add touch handler for mobile
+        card.addEventListener('touchend', (e) => {
+            console.log('Card touched, connection mode:', isConnectionMode, 'disconnect mode:', isDisconnectMode);
+            if (!e.target.closest('.card-header') && !e.target.closest('.card-controls') && !e.target.closest('.resize-handle')) {
+                if (isConnectionMode || isDisconnectMode) {
+                    console.log('Calling handleCardConnection for mobile');
+                    handleCardConnection(card, e);
+                }
+            }
+        });
+        
+        // Also add click handler as fallback for mobile
+        card.addEventListener('click', (e) => {
+            console.log('Card clicked, connection mode:', isConnectionMode, 'disconnect mode:', isDisconnectMode);
+            if (!e.target.closest('.card-header') && !e.target.closest('.card-controls') && !e.target.closest('.resize-handle')) {
+                if (isConnectionMode || isDisconnectMode) {
+                    console.log('Calling handleCardConnection for click fallback');
+                    handleCardConnection(card, e);
+                }
+            }
+        });
+        
+        // Add color change functionality
+        const colorDot = card.querySelector('.color-dot');
+        if (colorDot) {
+            colorDot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                changeCardColor(card);
+            });
+        }
+        
+        // Add delete functionality
+        const deleteDot = card.querySelector('.delete-dot');
+        if (deleteDot) {
+            deleteDot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteCard(card);
+            });
+        }
+        
+        // Save to storage when content changes
+        const contentArea = card.querySelector('.content-area');
+        if (contentArea) {
+            contentArea.addEventListener('input', debounce(saveCardsToStorage, 500));
+        }
+        
+        // Animate card appearance
+        requestAnimationFrame(() => {
+            card.classList.add('show');
+        });
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
     // Initialize zoom functionality
     let currentZoom = 100;
     const zoomLevelElement = document.querySelector('.zoom-level');
@@ -189,15 +336,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let isConnectionMode = false;
     let isDisconnectMode = false;
     const mobileConnectionBtn = document.getElementById('mobile-connection-btn');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileConnectBtn = document.getElementById('mobile-connect-btn');
     const mobileDisconnectBtn = document.getElementById('mobile-disconnect-btn');
     
     // Mobile connection button functionality
     if (mobileConnectBtn) {
-        console.log('Connect button found');
+        console.log('Connect button found and initialized');
         mobileConnectBtn.addEventListener('click', () => {
-            console.log('Connect button clicked');
+            console.log('Connect button clicked - before toggle');
             isConnectionMode = !isConnectionMode;
             isDisconnectMode = false;
             mobileConnectBtn.classList.toggle('active');
@@ -208,6 +354,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.selected-for-connection').forEach(card => {
                 card.classList.remove('selected-for-connection');
             });
+            
+            // Show feedback
+            if (isConnectionMode) {
+                console.log('Connection mode activated');
+            } else {
+                console.log('Connection mode deactivated');
+            }
         });
         
         mobileConnectBtn.addEventListener('touchstart', (e) => {
@@ -216,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mobileConnectBtn.click();
         }, { passive: false });
     } else {
-        console.log('Connect button not found');
+        console.log('Connect button NOT found - check HTML');
     }
     
     if (mobileDisconnectBtn) {
@@ -233,6 +386,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.selected-for-connection').forEach(card => {
                 card.classList.remove('selected-for-connection');
             });
+            
+            // Show feedback
+            if (isDisconnectMode) {
+                console.log('Disconnect mode activated');
+            } else {
+                console.log('Disconnect mode deactivated');
+            }
         });
         
         mobileDisconnectBtn.addEventListener('touchstart', (e) => {
@@ -268,74 +428,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, { passive: true });
 
-    // Mobile menu button (placeholder for future functionality)
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', () => {
-            showNotification('Menu functionality coming soon!');
-        });
-        
-        mobileMenuBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            mobileMenuBtn.click();
-        }, { passive: false });
-    }
-
     // Handle card selection for connection (simple tap system)
     function handleCardConnection(card, e) {
+        console.log('handleCardConnection called');
+        console.log('selectedCardForConnection:', selectedCardForConnection);
+        console.log('isConnectionMode:', isConnectionMode);
+        console.log('isDisconnectMode:', isDisconnectMode);
+        console.log('current card:', card);
+        
         // Handle shift+click for desktop (always works regardless of mode)
         const isShiftClick = e.shiftKey;
         
         // For mobile modes, only work in connection or disconnect mode
-        if (!isShiftClick && !isConnectionMode && !isDisconnectMode) return;
-        
-        e.preventDefault();
-        e.stopPropagation();
+        if (!isShiftClick && !isConnectionMode && !isDisconnectMode) {
+            console.log('Not in connection mode and not shift click - returning');
+            return;
+        }
         
         if (!selectedCardForConnection) {
             // First card selection
+            console.log('Selecting first card');
             selectedCardForConnection = card;
             card.classList.add('selected-for-connection');
-            
-            if (isShiftClick) {
-                showNotification('Select second card to connect');
-            } else if (isConnectionMode) {
-                showNotification('Select second card to connect');
-            } else {
-                showNotification('Select second card to disconnect');
-            }
         } else if (selectedCardForConnection === card) {
             // Same card clicked - deselect
+            console.log('Deselecting same card');
             card.classList.remove('selected-for-connection');
             selectedCardForConnection = null;
-            showNotification('Selection cancelled');
         } else {
-            if (isShiftClick || isConnectionMode) {
-                // Connect mode - check if connection already exists
-                const existingConnection = connections.find(conn => 
-                    (conn.card1 === selectedCardForConnection && conn.card2 === card) ||
-                    (conn.card1 === card && conn.card2 === selectedCardForConnection)
-                );
-                
-                if (existingConnection) {
-                    showNotification('Cards already connected');
-                } else {
-                    // Create new connection
-                    createConnection(selectedCardForConnection, card);
-                    showNotification('Cards connected');
-                }
-            } else {
-                // Disconnect mode - check if connection exists
-                const existingConnection = connections.find(conn => 
-                    (conn.card1 === selectedCardForConnection && conn.card2 === card) ||
-                    (conn.card1 === card && conn.card2 === selectedCardForConnection)
-                );
-                
+            console.log('Selecting second card for connection/disconnection');
+            
+            // Check if connection already exists
+            const existingConnection = connections.find(conn => 
+                (conn.card1 === selectedCardForConnection && conn.card2 === card) ||
+                (conn.card1 === card && conn.card2 === selectedCardForConnection)
+            );
+            
+            if (isShiftClick) {
+                // Desktop shift+click - toggle connection
                 if (existingConnection) {
                     // Remove existing connection
+                    console.log('Removing existing connection (desktop shift+click)');
                     removeConnection(existingConnection);
-                    showNotification('Cards disconnected');
                 } else {
-                    showNotification('Cards not connected');
+                    // Create new connection
+                    console.log('Creating new connection (desktop shift+click)');
+                    createConnection(selectedCardForConnection, card);
+                }
+            } else if (isConnectionMode) {
+                // Mobile connect mode - only create connections
+                if (existingConnection) {
+                    console.log('Cards already connected (mobile connect mode)');
+                } else {
+                    console.log('Creating new connection (mobile connect mode)');
+                    createConnection(selectedCardForConnection, card);
+                }
+            } else if (isDisconnectMode) {
+                // Mobile disconnect mode - only remove connections
+                if (existingConnection) {
+                    console.log('Removing connection (mobile disconnect mode)');
+                    removeConnection(existingConnection);
+                } else {
+                    console.log('Cards not connected (mobile disconnect mode)');
                 }
             }
             
@@ -456,66 +610,61 @@ document.addEventListener('DOMContentLoaded', function() {
         // Fixed position for all cards - relative to canvas area
         const xPos = 100; // pixels from left of canvas
         const yPos = 100; // pixels from top of canvas
-
-        // Create card element
-        const card = document.createElement('div');
-        card.className = 'resizable-card';
-        card.style.left = `${xPos}px`;
-        card.style.top = `${yPos}px`;
-        card.style.position = 'absolute'; // Use absolute positioning within canvas
-        card.style.transform = 'none'; // Remove center transform
         
-        card.innerHTML = `
-            <div class="card-header">
-                <div class="card-controls">
-                    <div class="control-dot color-dot" title="Change Color"></div>
-                    <div class="control-dot delete-dot" title="Delete Card"></div>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="content-area" contenteditable="true" tabindex="0"></div>
-            </div>
-            <div class="resize-handle"></div>
-        `;
+        const cardData = {
+            id: Date.now().toString(),
+            left: `${xPos}px`,
+            top: `${yPos}px`,
+            width: '250px',
+            height: '200px',
+            content: '',
+            color: ''
+        };
+        
+        createCardFromData(cardData);
+        saveCardsToStorage();
+    }
 
-        // Add card to canvas area instead of body
-        canvasArea.appendChild(card);
-
-        // Add connection click handler (mouse and touch) - simplified
+    // Initialize
+    console.log('Prompty UI initialized');
+    
+    // Load saved cards on page load
+    loadCardsFromStorage();
+    
+    // Also attach event listeners to any existing cards (in case they were added before this script ran)
+    document.querySelectorAll('.resizable-card').forEach(card => {
+        console.log('Found existing card, attaching event listeners');
+        // Re-initialize interactions for existing cards
+        const contentArea = card.querySelector('.content-area');
+        if (contentArea) {
+            contentArea.addEventListener('input', debounce(saveCardsToStorage, 500));
+        }
+        
+        // Add connection handlers
         card.addEventListener('click', (e) => {
-            // Handle shift+click for desktop connections
             if (e.shiftKey) {
                 handleCardConnection(card, e);
                 return;
             }
             
-            // Only handle connection clicks on content area, not on header, controls, or resize handle
             if (!e.target.closest('.card-header') && !e.target.closest('.card-controls') && !e.target.closest('.resize-handle')) {
                 if (isConnectionMode || isDisconnectMode) {
+                    console.log('Calling handleCardConnection for existing card');
                     handleCardConnection(card, e);
                 }
             }
         });
-
-        // Add touch events for mobile - simplified (no long press)
-        card.addEventListener('touchstart', (e) => {
-            // Only handle card touch events on content area, not on header, controls, or resize handle
-            const target = e.target;
-            if (!target.closest('.card-header') && !target.closest('.card-controls') && !target.closest('.resize-handle')) {
+        
+        card.addEventListener('touchend', (e) => {
+            console.log('Existing card touched, connection mode:', isConnectionMode, 'disconnect mode:', isDisconnectMode);
+            if (!e.target.closest('.card-header') && !e.target.closest('.card-controls') && !e.target.closest('.resize-handle')) {
                 if (isConnectionMode || isDisconnectMode) {
+                    console.log('Calling handleCardConnection for existing card mobile');
                     handleCardConnection(card, e);
                 }
             }
-        }, { passive: false });
-
-        // Initialize card functionality
-        initializeResizableCard(card);
-
-        // Animate card appearance
-        requestAnimationFrame(() => {
-            card.classList.add('show');
         });
-    }
+    });
 
     // Initialize resizable card functionality
     function initializeResizableCard(card) {
@@ -584,6 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.classList.remove('dragging');
                 cardHeader.style.cursor = 'grab';
                 console.log('Drag ended');
+                saveCardsToStorage(); // Save to storage after moving card
             }
         }
 
@@ -636,6 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 isResizing = false;
                 card.style.transition = '';
                 console.log('Resize ended');
+                saveCardsToStorage(); // Save to storage after resizing card
             }
         }
 
@@ -742,12 +893,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return true; // Keep in array
         });
         
+        // Add removing class for animation
         card.classList.add('removing');
+
+        // Remove card after animation
         setTimeout(() => {
             if (card.parentNode) {
                 card.parentNode.removeChild(card);
             }
-            showNotification('Card deleted');
+            saveCardsToStorage(); // Save to storage after deletion
         }, 300);
     }
 
@@ -879,6 +1033,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.parentNode.removeChild(card);
                 }
             });
+            saveCardsToStorage(); // Save to storage after deleting all cards
             showNotification(`Deleted ${allCards.length} card(s)`);
         }, 300);
     }
@@ -963,13 +1118,8 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteBtn.click();
         }
         
-        // A key for add action
-        if (e.key === 'a' && !e.ctrlKey && !e.metaKey) {
-            e.preventDefault();
-            addBtn.click();
-        }
-    });
-
+            });
+    
     // Canvas click handler removed
     // canvasArea.addEventListener('click', function(e) {
     //     if (e.target === canvasArea) {

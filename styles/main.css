@@ -357,25 +357,33 @@ body {
     .floating-bar {
         min-width: auto;
         width: 95%;
-        padding: 0 8px;
-        gap: 8px;
+        padding: 0 12px;
+        gap: 0;
         top: 10px;
+        justify-content: space-between;
+    }
+    
+    .bar-left {
+        flex: 0 0 auto;
+    }
+    
+    .bar-center {
+        gap: 8px;
+        flex: 1 1 auto;
+        justify-content: center;
+        margin: 0 8px;
+    }
+    
+    .bar-right {
+        flex: 0 0 auto;
     }
     
     .bar-left .brand-name {
         display: none;
     }
     
-    .bar-center {
-        gap: 6px;
-    }
-    
-    .action-btn-menu {
-        display: flex;
-    }
-    
     .bar-right .zoom-controls {
-        gap: 4px;
+        gap: 6px;
     }
     
     .zoom-btn {
@@ -574,6 +582,16 @@ body {
 
 .resizable-card.selected-for-connection {
     box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.6);
+}
+
+.canvas-area.connection-mode-active {
+    background: rgba(74, 158, 255, 0.02);
+    border: 2px dashed rgba(74, 158, 255, 0.3);
+}
+
+.canvas-area.disconnect-mode-active {
+    background: rgba(255, 100, 100, 0.02);
+    border: 2px dashed rgba(255, 100, 100, 0.3);
 }
 
 .resizable-card.show {
