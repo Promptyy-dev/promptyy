@@ -5,6 +5,18 @@
     box-sizing: border-box;
 }
 
+/* Only apply fixed positioning to index.html body */
+body.index-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+    width: 100vw;
+    position: fixed;
+}
+
+/* Default body styles for other pages */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background-color: #1e1e1e;
@@ -180,6 +192,9 @@ body {
     transform: translateX(-50%);
     z-index: 999;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .instruction-text {
@@ -188,6 +203,125 @@ body {
     font-size: 11px;
     font-weight: 400;
     white-space: nowrap;
+}
+
+.desktop-text {
+    display: block;
+}
+
+.mobile-text {
+    display: none;
+}
+
+.mobile-connect-btn,
+.mobile-disconnect-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(74, 158, 255, 0.15);
+    color: #4a9eff;
+    border: 1px solid rgba(74, 158, 255, 0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: all;
+    min-height: 32px;
+    min-width: 80px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.mobile-connect-btn:hover,
+.mobile-disconnect-btn:hover {
+    background: rgba(74, 158, 255, 0.25);
+    border-color: rgba(74, 158, 255, 0.5);
+}
+
+.mobile-connect-btn.active {
+    background: rgba(74, 158, 255, 0.4);
+    border-color: #4a9eff;
+    color: #ffffff;
+}
+
+.mobile-disconnect-btn.active {
+    background: rgba(255, 74, 74, 0.4);
+    border-color: #ff4a4a;
+    color: #ffffff;
+}
+
+.mobile-disconnect-btn {
+    background: rgba(255, 74, 74, 0.15);
+    color: #ff4a4a;
+    border: 1px solid rgba(255, 74, 74, 0.3);
+}
+
+.mobile-disconnect-btn:hover {
+    background: rgba(255, 74, 74, 0.25);
+    border-color: rgba(255, 74, 74, 0.5);
+}
+
+.mobile-connection-btn {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    background: rgba(74, 158, 255, 0.15);
+    color: #4a9eff;
+    border: 1px solid rgba(74, 158, 255, 0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: all;
+}
+
+.mobile-connection-btn.active {
+    background: rgba(74, 158, 255, 0.4);
+    border-color: #4a9eff;
+    color: #ffffff;
+}
+
+.mobile-connection-buttons {
+    display: none;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Action button menu */
+.action-btn-menu {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #3a3a3a;
+    background-color: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #cccccc;
+}
+
+.action-btn-menu:hover {
+    border-color: #ffffff;
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.action-btn-menu:focus {
+    outline-offset: 2px;
+    border-color: #4a9eff;
+}
+
+.action-btn-menu:active {
+    border-color: #ffffff;
+    color: #ffffff;
+    transform: scale(1.04);
 }
 
 /* Main Content Area */
@@ -222,8 +356,148 @@ body {
 @media (max-width: 768px) {
     .floating-bar {
         min-width: auto;
-        width: 90%;
-        padding: 0 12px;
+        width: 95%;
+        padding: 0 8px;
+        gap: 8px;
+        top: 10px;
+    }
+    
+    .bar-left .brand-name {
+        display: none;
+    }
+    
+    .bar-center {
+        gap: 6px;
+    }
+    
+    .action-btn-menu {
+        display: flex;
+    }
+    
+    .bar-right .zoom-controls {
+        gap: 4px;
+    }
+    
+    .zoom-btn {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .zoom-level {
+        font-size: 10px;
+        min-width: 32px;
+    }
+    
+    .instructions {
+        top: 60px;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .desktop-text {
+        display: none;
+    }
+    
+    .mobile-text {
+        display: block;
+    }
+    
+    .mobile-connection-btn {
+        display: none;
+    }
+    
+    .mobile-connection-buttons {
+        display: flex;
+    }
+    
+    .mobile-connect-btn,
+    .mobile-disconnect-btn {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .mobile-connect-btn::after,
+    .mobile-disconnect-btn::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+    }
+    
+    .resizable-card {
+        width: 140px;
+        height: 140px;
+        min-width: 120px;
+        min-height: 120px;
+        max-width: 85vw;
+        max-height: 50vh;
+    }
+    
+    .resizable-card .card-header {
+        height: 50px;
+        padding: 8px;
+    }
+    
+    .resizable-card .card-controls {
+        padding: 10px;
+        gap: 6px;
+    }
+    
+    .resizable-card .control-dot {
+        width: 20px;
+        height: 20px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .resizable-card .card-content {
+        padding: 15px;
+    }
+    
+    .resizable-card .content-area {
+        font-size: 16px;
+        padding: 8px;
+    }
+    
+    .resize-handle {
+        width: 24px;
+        height: 24px;
+        min-width: 44px;
+        min-height: 44px;
+        bottom: 6px;
+        right: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-bar {
+        width: 98%;
+        padding: 0 6px;
+    }
+    
+    .logo {
+        font-size: 18px;
+    }
+    
+    .action-btn-add,
+    .action-btn-delete,
+    .action-btn-menu {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .zoom-btn {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .zoom-level {
+        font-size: 9px;
+        min-width: 28px;
     }
 }
 
@@ -245,7 +519,13 @@ body {
 
 /* Focus States */
 .zoom-btn:focus {
+    outline-offset: 2px;
+    border-color: #4a9eff;
+}
 
+.bar-center .action-btn-add:focus,
+.bar-center .action-btn-delete:focus,
+.action-btn-menu:focus {
     outline-offset: 2px;
     border-color: #4a9eff;
 }
@@ -253,7 +533,8 @@ body {
 /* Disabled States */
 .zoom-btn:disabled,
 .bar-center .action-btn-add:disabled,
-.bar-center .action-btn-delete:disabled {
+.bar-center .action-btn-delete:disabled,
+.action-btn-menu:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     border-color: #3a3a3a;
@@ -262,7 +543,8 @@ body {
 
 .zoom-btn:disabled:hover,
 .bar-center .action-btn-add:disabled:hover,
-.bar-center .action-btn-delete:disabled:hover {
+.bar-center .action-btn-delete:disabled:hover,
+.action-btn-menu:disabled:hover {
     border-color: #3a3a3a;
     color: #3a3a3a;
     transform: none;
@@ -416,6 +698,7 @@ body {
     transition: opacity 0.2s ease;
     background: linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.3) 50%);
     border-radius: 0 0 18px 0;
+    z-index: 10;
 }
 
 .resizable-card:hover .resize-handle {
@@ -429,37 +712,113 @@ body {
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .resizable-card {
-        width: 120px;
-        height: 120px;
-        max-width: 80vw;
-        max-height: 60vh;
-        height: 250px;
-        max-width: 90vw;
-        max-height: 70vh;
+        width: 140px;
+        height: 140px;
+        min-width: 120px;
+        min-height: 120px;
+        max-width: 85vw;
+        max-height: 50vh;
     }
     
     .resizable-card .card-header {
-        height: 44px;
+        height: 20px;
+        padding: 0;
+        justify-content: flex-end;
     }
     
-    .resizable-card .header-left {
-        padding: 0 12px;
-    }
-    
-    .resizable-card .header-right {
-        padding: 0 16px 0 12px;
+    .resizable-card .card-controls {
+        padding: 4px;
+        gap: 2px;
+        position: static;
+        top: auto;
+        right: auto;
+        z-index: auto;
     }
     
     .resizable-card .control-dot {
-        width: 16px;
-        height: 16px;
+        width: 10px;
+        height: 10px;
+        min-width: 10px;
+        min-height: 10px;
     }
     
     .resizable-card .card-content {
         padding: 12px;
+        padding-top: 0;
     }
     
-    .resizable-card .card-actions {
-        padding: 10px 12px 12px;
+    .resizable-card .content-area {
+        font-size: 16px;
+        padding: 8px;
     }
+    
+    .resizable-card .resize-handle {
+        width: 32px;
+        height: 32px;
+        bottom: 2px;
+        right: 2px;
+        opacity: 0.7;
+        z-index: 15;
+    }
+    
+.resizable-card .resize-handle:hover {
+opacity: 1;
+}
+}
+
+/* Touch-friendly improvements */
+@media (pointer: coarse) {
+.resizable-card .control-dot {
+width: 20px;
+height: 20px;
+min-width: 20px;
+min-height: 20px;
+position: relative;
+}
+    
+.resizable-card .control-dot::after {
+content: '';
+position: absolute;
+top: -8px;
+left: -8px;
+right: -8px;
+bottom: -8px;
+}
+    
+.resizable-card .resize-handle {
+width: 40px;
+height: 40px;
+min-width: 40px;
+min-height: 40px;
+bottom: 0;
+right: 0;
+opacity: 0.8;
+z-index: 20;
+}
+    
+.resizable-card .resize-handle::after {
+content: '';
+position: absolute;
+top: -10px;
+left: -10px;
+right: -10px;
+bottom: -10px;
+}
+    
+.resizable-card .resize-handle:hover {
+opacity: 1;
+}
+    
+.zoom-btn,
+.action-btn-add,
+.action-btn-delete,
+.action-btn-menu {
+min-width: 44px;
+min-height: 44px;
+}
+    
+.mobile-connection-btn {
+min-height: 44px;
+padding: 8px 12px;
+}
 }

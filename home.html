@@ -29,6 +29,48 @@
             padding: 0;
         }
         
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            body {
+                overflow: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .home-container {
+                flex-direction: column;
+                height: auto;
+                width: 100%;
+                min-height: 100vh;
+            }
+            
+            .product-section {
+                flex: 1;
+                padding: 20px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                max-width: 100vw;
+            }
+            
+            .product-logo {
+                font-size: 36px;
+            }
+            
+            .product-title {
+                font-size: 28px;
+            }
+            
+            .product-subtitle {
+                font-size: 14px;
+                margin-bottom: 24px;
+            }
+            
+            .usefulness-list {
+                max-width: 100%;
+                padding: 0 20px;
+            }
+        }
+        
         .home-container {
             display: flex;
             height: 100vh;
@@ -299,12 +341,15 @@
             .product-section {
                 max-width: 100vw;
                 flex: 1;
+                padding: 30px 20px;
             }
             
             .blog-section {
                 border-bottom: none;
                 max-width: 100vw;
                 flex: 1;
+                padding: 30px 20px;
+                min-height: auto;
             }
         }
         
@@ -313,12 +358,57 @@
                 padding: 30px 20px;
             }
             
+            .product-section {
+                padding: 40px 20px;
+                min-height: auto;
+            }
+            
             .product-title {
                 font-size: 28px;
             }
             
             .blog-title {
                 font-size: 20px;
+            }
+            
+            .product-logo {
+                font-size: 40px;
+            }
+            
+            .product-subtitle {
+                font-size: 14px;
+                max-width: 400px;
+            }
+            
+            .usefulness-list {
+                max-width: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .product-section {
+                padding: 30px 15px;
+            }
+            
+            .blog-section {
+                padding: 30px 15px;
+            }
+            
+            .product-title {
+                font-size: 24px;
+            }
+            
+            .product-logo {
+                font-size: 36px;
+            }
+            
+            .product-subtitle {
+                font-size: 13px;
+            }
+            
+            .cta-button {
+                padding: 12px 24px;
+                font-size: 13px;
             }
         }
     </style>

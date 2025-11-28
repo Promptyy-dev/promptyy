@@ -18,18 +18,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let canvasCenterX = 0;
     let canvasCenterY = 0;
 
-    // Enable canvas dragging - work from anywhere except cards
-    document.addEventListener('mousedown', (e) => {
+    // Enable canvas dragging - work from anywhere except cards (mouse and touch)
+    function startCanvasDrag(clientX, clientY) {
         // Only drag if clicking on empty canvas (not on cards or controls)
-        const isCard = e.target.closest('.resizable-card');
-        const isControl = e.target.closest('.floating-bar');
+        const touch = clientX.touches ? clientX.touches[0] : clientX;
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        const isCard = target.closest('.resizable-card');
+        const isControl = target.closest('.floating-bar');
         
         if (!isCard && !isControl) {
             isCanvasDragging = true;
             canvasArea.style.cursor = 'grabbing';
             
-            canvasStartX = e.clientX;
-            canvasStartY = e.clientY;
+            canvasStartX = touch.clientX;
+            canvasStartY = touch.clientY;
             
             // Get current transform values
             const transform = window.getComputedStyle(canvasArea).transform;
@@ -38,15 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvasOffsetX = parseFloat(matrix[4]) || 0;
                 canvasOffsetY = parseFloat(matrix[5]) || 0;
             }
+            
+            return true; // Indicate drag started
         }
-    });
+        return false; // Indicate drag not started
+    }
 
-    document.addEventListener('mousemove', (e) => {
+    function dragCanvas(clientX, clientY) {
         if (!isCanvasDragging) return;
         
-        e.preventDefault();
-        const deltaX = e.clientX - canvasStartX;
-        const deltaY = e.clientY - canvasStartY;
+        const touch = clientX.touches ? clientX.touches[0] : clientX;
+        
+        const deltaX = touch.clientX - canvasStartX;
+        const deltaY = touch.clientY - canvasStartY;
         
         // Apply new transform with zoom and pan
         const zoomFactor = currentZoom / 100;
@@ -55,9 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         canvasArea.style.transform = `scale(${zoomFactor}) translate(${newOffsetX / zoomFactor}px, ${newOffsetY / zoomFactor}px)`;
         canvasArea.style.transformOrigin = 'center center';
-    });
+    }
 
-    document.addEventListener('mouseup', () => {
+    function endCanvasDrag() {
         if (isCanvasDragging) {
             isCanvasDragging = false;
             canvasArea.style.cursor = 'default';
@@ -70,7 +76,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvasOffsetY = parseFloat(matrix[5]) || 0;
             }
         }
-    });
+    }
+
+    // Mouse events
+    document.addEventListener('mousedown', (e) => startCanvasDrag(e));
+    document.addEventListener('mousemove', (e) => dragCanvas(e));
+    document.addEventListener('mouseup', () => endCanvasDrag());
+
+    // Touch events for mobile - only prevent default when actually dragging
+    document.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        const isCard = target.closest('.resizable-card');
+        const isControl = target.closest('.floating-bar');
+        const isCardHeader = target.closest('.card-header');
+        const isResizeHandle = target.closest('.resize-handle');
+        
+        // Only prevent default and start drag if touching empty canvas
+        // Don't interfere with any card interactions (drag, resize, connect)
+        if (!isCard && !isControl && !isCardHeader && !isResizeHandle) {
+            const dragStarted = startCanvasDrag(e);
+            if (dragStarted) {
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+        if (isCanvasDragging) {
+            e.preventDefault();
+            dragCanvas(e);
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+        if (isCanvasDragging) {
+            e.preventDefault();
+            endCanvasDrag();
+        }
+    }, { passive: false });
 
     // Zoom controls
     zoomInBtn.addEventListener('click', function() {
@@ -141,24 +185,146 @@ document.addEventListener('DOMContentLoaded', function() {
     let connections = [];
     let connectionId = 0;
 
-    // Handle card selection for connection
-    function handleCardConnection(card, e) {
-        if (e.shiftKey) {
-            e.preventDefault();
-            e.stopPropagation();
+    // Mobile connection mode
+    let isConnectionMode = false;
+    let isDisconnectMode = false;
+    const mobileConnectionBtn = document.getElementById('mobile-connection-btn');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileConnectBtn = document.getElementById('mobile-connect-btn');
+    const mobileDisconnectBtn = document.getElementById('mobile-disconnect-btn');
+    
+    // Mobile connection button functionality
+    if (mobileConnectBtn) {
+        console.log('Connect button found');
+        mobileConnectBtn.addEventListener('click', () => {
+            console.log('Connect button clicked');
+            isConnectionMode = !isConnectionMode;
+            isDisconnectMode = false;
+            mobileConnectBtn.classList.toggle('active');
+            mobileDisconnectBtn.classList.remove('active');
+            selectedCardForConnection = null;
             
-            if (!selectedCardForConnection) {
-                // First card selection
-                selectedCardForConnection = card;
-                card.classList.add('selected-for-connection');
-                showNotification('Select second card to connect');
-            } else if (selectedCardForConnection === card) {
-                // Same card clicked - deselect
+            // Clear any existing selections
+            document.querySelectorAll('.selected-for-connection').forEach(card => {
                 card.classList.remove('selected-for-connection');
-                selectedCardForConnection = null;
-                showNotification('Connection cancelled');
+            });
+        });
+        
+        mobileConnectBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log('Connect button touched');
+            mobileConnectBtn.click();
+        }, { passive: false });
+    } else {
+        console.log('Connect button not found');
+    }
+    
+    if (mobileDisconnectBtn) {
+        console.log('Disconnect button found');
+        mobileDisconnectBtn.addEventListener('click', () => {
+            console.log('Disconnect button clicked');
+            isDisconnectMode = !isDisconnectMode;
+            isConnectionMode = false;
+            mobileDisconnectBtn.classList.toggle('active');
+            mobileConnectBtn.classList.remove('active');
+            selectedCardForConnection = null;
+            
+            // Clear any existing selections
+            document.querySelectorAll('.selected-for-connection').forEach(card => {
+                card.classList.remove('selected-for-connection');
+            });
+        });
+        
+        mobileDisconnectBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log('Disconnect button touched');
+            mobileDisconnectBtn.click();
+        }, { passive: false });
+    } else {
+        console.log('Disconnect button not found');
+    }
+    
+    // Add click handler to dismiss keyboard when clicking outside text areas
+    document.addEventListener('click', (e) => {
+        // Check if clicking outside any contenteditable element
+        const isContentEditable = e.target.closest('.content-area');
+        if (!isContentEditable) {
+            // Blur all contenteditable elements to dismiss keyboard
+            document.querySelectorAll('.content-area').forEach(area => {
+                area.blur();
+            });
+        }
+    });
+
+    // Add touch handler for mobile
+    document.addEventListener('touchstart', (e) => {
+        // Check if touching outside any contenteditable element
+        const isContentEditable = e.target.closest('.content-area');
+        if (!isContentEditable) {
+            // Blur all contenteditable elements to dismiss keyboard
+            document.querySelectorAll('.content-area').forEach(area => {
+                area.blur();
+            });
+        }
+    }, { passive: true });
+
+    // Mobile menu button (placeholder for future functionality)
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            showNotification('Menu functionality coming soon!');
+        });
+        
+        mobileMenuBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            mobileMenuBtn.click();
+        }, { passive: false });
+    }
+
+    // Handle card selection for connection (simple tap system)
+    function handleCardConnection(card, e) {
+        // Handle shift+click for desktop (always works regardless of mode)
+        const isShiftClick = e.shiftKey;
+        
+        // For mobile modes, only work in connection or disconnect mode
+        if (!isShiftClick && !isConnectionMode && !isDisconnectMode) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!selectedCardForConnection) {
+            // First card selection
+            selectedCardForConnection = card;
+            card.classList.add('selected-for-connection');
+            
+            if (isShiftClick) {
+                showNotification('Select second card to connect');
+            } else if (isConnectionMode) {
+                showNotification('Select second card to connect');
             } else {
-                // Check if connection already exists
+                showNotification('Select second card to disconnect');
+            }
+        } else if (selectedCardForConnection === card) {
+            // Same card clicked - deselect
+            card.classList.remove('selected-for-connection');
+            selectedCardForConnection = null;
+            showNotification('Selection cancelled');
+        } else {
+            if (isShiftClick || isConnectionMode) {
+                // Connect mode - check if connection already exists
+                const existingConnection = connections.find(conn => 
+                    (conn.card1 === selectedCardForConnection && conn.card2 === card) ||
+                    (conn.card1 === card && conn.card2 === selectedCardForConnection)
+                );
+                
+                if (existingConnection) {
+                    showNotification('Cards already connected');
+                } else {
+                    // Create new connection
+                    createConnection(selectedCardForConnection, card);
+                    showNotification('Cards connected');
+                }
+            } else {
+                // Disconnect mode - check if connection exists
                 const existingConnection = connections.find(conn => 
                     (conn.card1 === selectedCardForConnection && conn.card2 === card) ||
                     (conn.card1 === card && conn.card2 === selectedCardForConnection)
@@ -167,18 +333,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (existingConnection) {
                     // Remove existing connection
                     removeConnection(existingConnection);
-                    showNotification('Connection removed');
+                    showNotification('Cards disconnected');
                 } else {
-                    // Create new connection
-                    createConnection(selectedCardForConnection, card);
-                    showNotification('Cards connected');
+                    showNotification('Cards not connected');
                 }
-                
-                selectedCardForConnection.classList.remove('selected-for-connection');
-                selectedCardForConnection = null;
             }
+            
+            selectedCardForConnection.classList.remove('selected-for-connection');
+            selectedCardForConnection = null;
         }
     }
+
+    // Remove long press detection - no longer needed
+    // let longPressTimer;
+    // function handleCardTouchStart(card, e) {
+    //     // Start long press timer
+    //     longPressTimer = setTimeout(() => {
+    //         card.dataset.longPress = 'true';
+    //         handleCardConnection(card, e);
+    //     }, 500); // 500ms for long press
+    // }
+
+    // function handleCardTouchEnd(card, e) {
+    //     // Clear long press timer
+    //     clearTimeout(longPressTimer);
+    //     card.dataset.longPress = 'false';
+    // }
 
     // Remove specific connection
     function removeConnection(connection) {
@@ -301,10 +481,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add card to canvas area instead of body
         canvasArea.appendChild(card);
 
-        // Add connection click handler
+        // Add connection click handler (mouse and touch) - simplified
         card.addEventListener('click', (e) => {
-            handleCardConnection(card, e);
+            // Handle shift+click for desktop connections
+            if (e.shiftKey) {
+                handleCardConnection(card, e);
+                return;
+            }
+            
+            // Only handle connection clicks on content area, not on header, controls, or resize handle
+            if (!e.target.closest('.card-header') && !e.target.closest('.card-controls') && !e.target.closest('.resize-handle')) {
+                if (isConnectionMode || isDisconnectMode) {
+                    handleCardConnection(card, e);
+                }
+            }
         });
+
+        // Add touch events for mobile - simplified (no long press)
+        card.addEventListener('touchstart', (e) => {
+            // Only handle card touch events on content area, not on header, controls, or resize handle
+            const target = e.target;
+            if (!target.closest('.card-header') && !target.closest('.card-controls') && !target.closest('.resize-handle')) {
+                if (isConnectionMode || isDisconnectMode) {
+                    handleCardConnection(card, e);
+                }
+            }
+        }, { passive: false });
 
         // Initialize card functionality
         initializeResizableCard(card);
@@ -318,11 +520,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize resizable card functionality
     function initializeResizableCard(card) {
         let isDragging = false;
-        let isFollowingCursor = false;
         let isResizing = false;
-        let startX, startY, initialX, initialY;
+        let startX, startY;
         let startWidth, startHeight;
-        let currentX = 0, currentY = 0;
+        let initialCardX, initialCardY;
 
         const colorDot = card.querySelector('.color-dot');
         const deleteDot = card.querySelector('.delete-dot');
@@ -330,151 +531,169 @@ document.addEventListener('DOMContentLoaded', function() {
         const resizeHandle = card.querySelector('.resize-handle');
         const cardHeader = card.querySelector('.card-header');
 
-        // Drag functionality - only works on header
-        cardHeader.addEventListener('mousedown', startDrag);
-        card.addEventListener('click', toggleDragMode);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', endDrag);
-
-        // Resize functionality
-        resizeHandle.addEventListener('mousedown', startResize);
-
-        function toggleDragMode(e) {
-            if (e.target.closest('.card-controls') || e.target.closest('.resize-handle')) return;
+        // SIMPLIFIED DRAG FUNCTIONALITY
+        function handleDragStart(e) {
+            // Don't drag if clicking on control dots
+            if (e.target.closest('.control-dot')) return;
             
-            if (isFollowingCursor) {
-                // Drop the card
-                isFollowingCursor = false;
-                card.style.transition = '';
-                card.classList.remove('dragging');
-                cardHeader.style.cursor = 'grab';
-            }
-        }
-
-        function startDrag(e) {
-            if (e.target.closest('.card-controls')) return;
+            console.log('Drag started on header');
             
-            e.preventDefault();
-            e.stopPropagation();
+            isDragging = true;
+            card.style.transition = 'none';
+            card.classList.add('dragging');
+            cardHeader.style.cursor = 'grabbing';
             
-            if (!isFollowingCursor) {
-                // Start following cursor mode
-                isFollowingCursor = true;
-                card.style.transition = 'none';
-                card.classList.add('dragging');
-                cardHeader.style.cursor = 'grabbing';
-                
-                // Calculate offset from mouse to card top-left
-                const canvasRect = canvasArea.getBoundingClientRect();
-                const cardRect = card.getBoundingClientRect();
-                const zoomFactor = currentZoom / 100;
-                
-                // Store the offset between mouse and card position
-                const mouseX = (e.clientX - canvasRect.left) / zoomFactor;
-                const mouseY = (e.clientY - canvasRect.top) / zoomFactor;
-                const cardX = (cardRect.left - canvasRect.left) / zoomFactor;
-                const cardY = (cardRect.top - canvasRect.top) / zoomFactor;
-                
-                startX = mouseX - cardX;
-                startY = mouseY - cardY;
-            }
-        }
-
-        function drag(e) {
-            if (!isFollowingCursor) return;
-            
-            e.preventDefault();
-            
-            // Get canvas rect for positioning
+            const rect = card.getBoundingClientRect();
             const canvasRect = canvasArea.getBoundingClientRect();
             const zoomFactor = currentZoom / 100;
             
-            // Calculate position relative to canvas
-            const mouseX = (e.clientX - canvasRect.left) / zoomFactor;
-            const mouseY = (e.clientY - canvasRect.top) / zoomFactor;
+            initialCardX = (rect.left - canvasRect.left) / zoomFactor;
+            initialCardY = (rect.top - canvasRect.top) / zoomFactor;
             
-            // Position card maintaining the offset from where you clicked
-            currentX = mouseX - startX;
-            currentY = mouseY - startY;
+            if (e.type === 'mousedown') {
+                startX = e.clientX;
+                startY = e.clientY;
+            } else {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
             
-            card.style.left = `${currentX}px`;
-            card.style.top = `${currentY}px`;
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDragMove(e) {
+            if (!isDragging) return;
             
-            // Update connections when card moves
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+            
+            const deltaX = (clientX - startX) / (currentZoom / 100);
+            const deltaY = (clientY - startY) / (currentZoom / 100);
+            
+            card.style.left = `${initialCardX + deltaX}px`;
+            card.style.top = `${initialCardY + deltaY}px`;
+            
             updateAllConnections();
         }
 
-        function endDrag() {
-            // Don't end drag on mouseup - wait for click to drop
+        function handleDragEnd() {
+            if (isDragging) {
+                isDragging = false;
+                card.style.transition = '';
+                card.classList.remove('dragging');
+                cardHeader.style.cursor = 'grab';
+                console.log('Drag ended');
+            }
         }
 
-        function startResize(e) {
-            e.preventDefault();
+        // SIMPLIFIED RESIZE FUNCTIONALITY
+        function handleResizeStart(e) {
+            console.log('Resize started');
             isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
+            card.style.transition = 'none';
             
-            // Get current card size accounting for zoom
-            const cardRect = card.getBoundingClientRect();
+            const rect = card.getBoundingClientRect();
             const zoomFactor = currentZoom / 100;
             
-            startWidth = cardRect.width / zoomFactor;
-            startHeight = cardRect.height / zoomFactor;
+            startWidth = rect.width / zoomFactor;
+            startHeight = rect.height / zoomFactor;
             
-            card.style.transition = 'none';
-            resizeHandle.style.cursor = 'nwse-resize';
+            if (e.type === 'mousedown') {
+                startX = e.clientX;
+                startY = e.clientY;
+            } else {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
         }
 
-        function resize(e) {
+        function handleResizeMove(e) {
             if (!isResizing) return;
             
-            e.preventDefault();
-            const deltaX = e.clientX - startX;
-            const deltaY = e.clientY - startY;
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
             
-            // Adjust for zoom level
-            const zoomFactor = currentZoom / 100;
-            const adjustedDeltaX = deltaX / zoomFactor;
-            const adjustedDeltaY = deltaY / zoomFactor;
+            const deltaX = (clientX - startX) / (currentZoom / 100);
+            const deltaY = (clientY - startY) / (currentZoom / 100);
             
-            let newWidth = startWidth + adjustedDeltaX;
-            let newHeight = startHeight + adjustedDeltaY;
+            let newWidth = startWidth + deltaX;
+            let newHeight = startHeight + deltaY;
             
-            // Apply size limits
-            const maxWidth = 400;
-            const maxHeight = 400;
-            const minWidth = 120;
-            const minHeight = 120;
+            // Apply limits
+            newWidth = Math.max(120, Math.min(400, newWidth));
+            newHeight = Math.max(120, Math.min(400, newHeight));
             
-            newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-            newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
-            
-            // Resize from bottom-right only - keep left/top fixed
             card.style.width = `${newWidth}px`;
             card.style.height = `${newHeight}px`;
-            // Don't update left/top - keep them fixed
         }
 
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', () => {
+        function handleResizeEnd() {
             if (isResizing) {
                 isResizing = false;
                 card.style.transition = '';
-                resizeHandle.style.cursor = '';
+                console.log('Resize ended');
             }
+        }
+
+        // Add event listeners to header for dragging
+        cardHeader.addEventListener('mousedown', handleDragStart);
+        cardHeader.addEventListener('touchstart', handleDragStart, { passive: false });
+
+        // Add event listeners to resize handle
+        resizeHandle.addEventListener('mousedown', handleResizeStart);
+        resizeHandle.addEventListener('touchstart', handleResizeStart, { passive: false });
+
+        // Global move and end listeners
+        document.addEventListener('mousemove', (e) => {
+            handleDragMove(e);
+            handleResizeMove(e);
         });
 
-        // Color change functionality
+        document.addEventListener('mouseup', (e) => {
+            handleDragEnd(e);
+            handleResizeEnd(e);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging || isResizing) {
+                e.preventDefault();
+                handleDragMove(e);
+                handleResizeMove(e);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            handleDragEnd(e);
+            handleResizeEnd(e);
+        });
+
+        // Color change functionality (touch and click)
         colorDot.addEventListener('click', (e) => {
             e.stopPropagation();
             changeCardColor(card);
         });
 
-        // Delete functionality
+        colorDot.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            changeCardColor(card);
+        }, { passive: false });
+
+        // Delete functionality (touch and click)
         deleteDot.addEventListener('click', (e) => {
             e.stopPropagation();
             deleteCard(card);
         });
+
+        deleteDot.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            deleteCard(card);
+        }, { passive: false });
 
         // Content area functionality
         contentArea.addEventListener('focus', () => {
@@ -538,6 +757,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Delete all cards triggered');
         showDeleteConfirmation();
     });
+    
+    // Add touch support for delete all button
+    deleteBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        console.log('Delete all button touched');
+        deleteBtn.click();
+    }, { passive: false });
 
     // Show delete confirmation dialog
     function showDeleteConfirmation() {
@@ -579,8 +805,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <p style="margin: 0 0 20px 0; opacity: 0.8;">Are you sure you want to delete ${allCards.length} card(s)?</p>
             <p style="margin: 0 0 24px 0; opacity: 0.6; font-size: 14px;">This action cannot be undone.</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
-                <button id="confirm-yes" style="background: #e53e3e; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">Yes</button>
-                <button id="confirm-no" style="background: #4a5568; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">No</button>
+                <button id="confirm-yes" style="background: #e53e3e; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 500; min-height: 44px; min-width: 80px;">Yes</button>
+                <button id="confirm-no" style="background: #4a5568; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 500; min-height: 44px; min-width: 80px;">No</button>
             </div>
         `;
         
@@ -588,15 +814,29 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(dialogOverlay);
         
         // Handle confirmation
-        document.getElementById('confirm-yes').addEventListener('click', () => {
+        const confirmYes = document.getElementById('confirm-yes');
+        const confirmNo = document.getElementById('confirm-no');
+        
+        confirmYes.addEventListener('click', () => {
             document.body.removeChild(dialogOverlay);
             deleteAllCards();
         });
         
-        document.getElementById('confirm-no').addEventListener('click', () => {
+        confirmNo.addEventListener('click', () => {
             document.body.removeChild(dialogOverlay);
             showNotification('Delete cancelled');
         });
+        
+        // Add touch support for confirmation buttons
+        confirmYes.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            confirmYes.click();
+        }, { passive: false });
+        
+        confirmNo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            confirmNo.click();
+        }, { passive: false });
         
         // Close on overlay click
         dialogOverlay.addEventListener('click', (e) => {
@@ -618,6 +858,14 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('No cards to delete');
             return;
         }
+        
+        // Remove all connections first
+        connections.forEach(connection => {
+            if (connection.line && connection.line.parentNode) {
+                connection.line.parentNode.removeChild(connection.line);
+            }
+        });
+        connections = [];
         
         // Add removing class to all cards for animation
         allCards.forEach(card => {
