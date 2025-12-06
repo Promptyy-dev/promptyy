@@ -48,6 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
         card.style.transform = 'none';
         if (cardData.color) {
             card.style.backgroundColor = cardData.color;
+            card.style.setProperty('--card-primary', cardData.color);
+            // Set matching border color
+            const colorIndex = 0; // Default to first color which matches our initial color
+            card.dataset.colorIndex = colorIndex;
+            card.style.setProperty('--card-border', '#e6ddc4');
         }
         
         card.innerHTML = `
@@ -535,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
         line.className = 'connection-line';
         line.style.cssText = `
             position: absolute;
-            background: #ffffff;
+            background: #1a1a1a;
             opacity: 0.6;
             height: 2px;
             transform-origin: left center;
@@ -618,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
             width: '250px',
             height: '200px',
             content: '',
-            color: ''
+            color: '#f8f5e6'
         };
         
         createCardFromData(cardData);
@@ -859,14 +864,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Change card color with better contrast
     function changeCardColor(card) {
         const colors = [
-    { primary: '#c08762ff', text: '#f1f5f9' }, // Slate Deep — calm, neutral  
-    { primary: '#aeb273ff', text: '#f8fafc' }, // Navy Black — high focus  
-    { primary: '#8397b3ff', text: '#e2e8f0' }, // Steel Slate — balanced  
-    { primary: '#58588fff', text: '#f4f4f5' }, // Warm Gray — gentle dark  
-    { primary: '#452478ff', text: '#f3e8ff' }, // Deep Violet — creative  
-    { primary: '#1e3a8a', text: '#dbeafe' }, // Dark Indigo — structured  
-    { primary: '#499065ff', text: '#dcfce7' }, // Forest Green — clarity  
-    { primary: '#9e4949ff', text: '#fee2e2' }  // Burgundy Deep — emotional  
+    { primary: '#f8f5e6', text: '#1a1a1a', border: '#e6ddc4' }, // Muted Yellow
+    { primary: '#e8eef5', text: '#1a1a1a', border: '#d1dce8' }, // Muted Blue
+    { primary: '#e8f2e8', text: '#1a1a1a', border: '#d1e6d1' }, // Muted Green
+    { primary: '#f5e8f0', text: '#1a1a1a', border: '#e6d1dc' }, // Muted Pink
+    { primary: '#ede8f5', text: '#1a1a1a', border: '#dcd1e6' }, // Muted Purple
+    { primary: '#f5ede6', text: '#1a1a1a', border: '#e6dcd1' }, // Muted Orange
+    { primary: '#f5e8e8', text: '#1a1a1a', border: '#e6d1d1' }, // Muted Red
+    { primary: '#f0f0f0', text: '#1a1a1a', border: '#d9d9d9' }, // Muted Gray
+    { primary: '#e6f5f2', text: '#1a1a1a', border: '#d1e6e0' }, // Muted Teal
+    { primary: '#f0e8f5', text: '#1a1a1a', border: '#e0d1e6' }, // Muted Lavender
+    { primary: '#f5f0e6', text: '#1a1a1a', border: '#e6e0d1' }, // Muted Peach
+    { primary: '#e8f2f5', text: '#1a1a1a', border: '#d1e6ec' }, // Muted Sky
+    { primary: '#e8f5e8', text: '#1a1a1a', border: '#d1e6d1' }, // Muted Mint
+    { primary: '#f5e8f2', text: '#1a1a1a', border: '#e6d1e0' }, // Muted Rose
+    { primary: '#f0e8f5', text: '#1a1a1a', border: '#e0d1e6' }, // Muted Periwinkle
+    { primary: '#f5f0e8', text: '#1a1a1a', border: '#e6e0d1' }, // Muted Amber
+    { primary: '#f5e8e8', text: '#1a1a1a', border: '#e6d1d1' }, // Muted Ruby
+    { primary: '#f0f2f5', text: '#1a1a1a', border: '#d9dde6' }, // Muted Slate
+    { primary: '#e8f2f5', text: '#1a1a1a', border: '#d1e6ec' }, // Muted Alice
+    { primary: '#f2f5e8', text: '#1a1a1a', border: '#dde6d1' }, // Muted Lime
+    { primary: '#f5f5f5', text: '#1a1a1a', border: '#e0e0e0' }, // Light White
+    { primary: '#f0f4f8', text: '#1a1a1a', border: '#d6e3ec' }, // Ice Blue
+    { primary: '#f4f1f8', text: '#1a1a1a', border: '#e0d6ec' }, // Haze Purple
+    { primary: '#f8f4f0', text: '#1a1a1a', border: '#ece6d6' }, // Cream
+    { primary: '#f0f8f4', text: '#1a1a1a', border: '#d6ece6' }, // Sage
+    { primary: '#f8f0f4', text: '#1a1a1a', border: '#ecd6e6' }, // Dusty Rose
+    { primary: '#f4f8f0', text: '#1a1a1a', border: '#e6ecd6' }, // Moss
+    { primary: '#f0f4f8', text: '#1a1a1a', border: '#d6e3ec' }, // Fog
+    { primary: '#f8f4f4', text: '#1a1a1a', border: '#ece6e6' }, // Blush
+    { primary: '#f4f4f8', text: '#1a1a1a', border: '#e6e6ec' }, // Dust
+    { primary: '#f2f8f2', text: '#1a1a1a', border: '#dde6dd' }  // Pale Green
 ];
 
         
@@ -875,8 +903,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const color = colors[nextIndex];
         
         card.dataset.colorIndex = nextIndex;
+        card.style.backgroundColor = color.primary;
         card.style.setProperty('--card-primary', color.primary);
         card.style.setProperty('--card-text', color.text);
+        card.style.setProperty('--card-border', color.border);
     }
 
     // Delete individual card function
@@ -945,13 +975,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const dialogBox = document.createElement('div');
         dialogBox.style.cssText = `
-            background: #2d3748;
-            color: white;
+            background: #ffffff;
+            color: #1a1a1a;
             padding: 24px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             min-width: 320px;
             text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         `;
         
         dialogBox.innerHTML = `
@@ -959,8 +990,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <p style="margin: 0 0 20px 0; opacity: 0.8;">Are you sure you want to delete ${allCards.length} card(s)?</p>
             <p style="margin: 0 0 24px 0; opacity: 0.6; font-size: 14px;">This action cannot be undone.</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
-                <button id="confirm-yes" style="background: #e53e3e; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 500; min-height: 44px; min-width: 80px;">Yes</button>
-                <button id="confirm-no" style="background: #4a5568; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 500; min-height: 44px; min-width: 80px;">No</button>
+                <button id="confirm-yes" style="background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 500; min-height: 44px; min-width: 80px;">Yes</button>
+                <button id="confirm-no" style="background: #f3f4f6; color: #1a1a1a; border: 1px solid rgba(0, 0, 0, 0.2); padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 500; min-height: 44px; min-width: 80px;">No</button>
             </div>
         `;
         
@@ -1057,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', function() {
             top: 20px;
             right: 20px;
             transform: translateX(0);
-            background-color: #3e5b7bff;
+            background-color: #1a1a1a;
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
@@ -1066,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: 2000;
             opacity: 0;
             transition: opacity 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         `;
 
         document.body.appendChild(notification);

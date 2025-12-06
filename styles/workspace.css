@@ -1,0 +1,321 @@
+/* ------------------------------------------------------
+   RESET + BASE
+------------------------------------------------------ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.index-page {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #fff;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1a1a1a;
+}
+
+body {
+    background: #fff;
+    color: #1a1a1a;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ------------------------------------------------------
+   FLOATING TOOLBAR
+------------------------------------------------------ */
+.floating-bar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0 20px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.10);
+    z-index: 1000;
+
+    animation: fadeIn 0.35s ease-out;
+}
+
+.bar-left,
+.bar-center,
+.bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a9eff;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------
+   BUTTONS
+------------------------------------------------------ */
+.action-btn-add,
+.action-btn-delete,
+.zoom-btn,
+.action-btn-menu {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.20);
+    background: transparent;
+
+    color: #666;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.action-btn-add:hover,
+.action-btn-delete:hover,
+.zoom-btn:hover,
+.action-btn-menu:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #111;
+    border-color: #111;
+}
+
+/* ------------------------------------------------------
+   ZOOM
+------------------------------------------------------ */
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.zoom-level {
+    min-width: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+/* ------------------------------------------------------
+   INSTRUCTIONS (TOP)
+------------------------------------------------------ */
+.instructions {
+    position: fixed;
+    top: 78px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #999;
+    font-size: 11px;
+
+    display: flex;
+    gap: 8px;
+
+    pointer-events: none;
+    z-index: 999;
+}
+
+.mobile-text { display: none; }
+
+/* ------------------------------------------------------
+   CANVAS AREA
+------------------------------------------------------ */
+.main-content,
+.canvas-area {
+    width: 100%;
+    height: 100%;
+}
+
+.canvas-area {
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ------------------------------------------------------
+   CARDS
+------------------------------------------------------ */
+.resizable-card {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+
+    width: 160px;
+    height: 160px;
+    min-width: 120px;
+    min-height: 120px;
+
+    background: var(--card-primary, #4a9eff);
+    border: 2px solid var(--card-border, #d1dce8);
+    border-radius: 20px;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    cursor: grab;
+    opacity: 0;
+    transform: scale(0.9);
+
+    z-index: 1500;
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.resizable-card.show { opacity: 1; transform: scale(1); }
+.resizable-card.dragging { transform: scale(1.05); cursor: grabbing; }
+
+/* header */
+.card-header {
+    height: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* color/delete circles */
+.card-controls {
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+}
+
+.control-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.25);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.color-dot { background: #6b7280; }
+.delete-dot { background: #dc2626; }
+.control-dot:hover { transform: scale(1.25); }
+
+/* card content */
+.card-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.content-area {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border: none;
+    background: transparent;
+
+    color: #1a1a1a;
+    font-size: 14px;
+    line-height: 1.4;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* resize handle */
+.resize-handle {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+
+    width: 18px;
+    height: 18px;
+
+    cursor: nwse-resize;
+    opacity: 0;
+
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.3) 50%);
+    border-radius: 0 0 18px 0;
+}
+
+.resizable-card:hover .resize-handle { opacity: 1; }
+
+/* ------------------------------------------------------
+   GAME WIDGET
+------------------------------------------------------ */
+.game-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    width: 400px;
+    height: 300px;
+
+    background: #2a2a2a;
+    border-radius: 12px;
+    border: 1px solid #333;
+
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    overflow: hidden;
+
+    z-index: 999;
+    transition: 0.3s;
+}
+
+.game-container.minimized {
+    height: 60px;
+    width: 200px;
+}
+
+.game-header {
+    padding: 12px 16px;
+    background: #2a2a2a;
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+}
+
+/* ------------------------------------------------------
+   MOBILE
+------------------------------------------------------ */
+@media (max-width: 768px) {
+    .floating-bar {
+        width: 92%;
+        padding: 0 12px;
+    }
+    .desktop-text { display: none; }
+    .mobile-text { display: block; }
+
+    .instructions {
+        top: 65px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .resizable-card {
+        width: 140px;
+        height: 140px;
+    }
+
+    .game-container {
+        left: 10px;
+        right: 10px;
+        width: auto;
+    }
+}

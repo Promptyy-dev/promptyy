@@ -20,8 +20,8 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            color: #ffffff;
+            background: #ffffff;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
             line-height: 1.6;
@@ -35,9 +35,9 @@
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(30, 30, 30, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             padding: 8px 40px;
             z-index: 1000;
             display: flex;
@@ -46,8 +46,8 @@
         }
         
         .nav-back {
-            background: rgba(74, 158, 255, 0.2);
-            color: #4a9eff;
+            background: rgba(0, 0, 0, 0.1);
+            color: #1a1a1a;
             padding: 6px 12px;
             border-radius: 4px;
             text-decoration: none;
@@ -57,7 +57,7 @@
         }
         
         .nav-back:hover {
-            background: rgba(74, 158, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
             transform: translateY(-1px);
         }
         
@@ -72,10 +72,19 @@
             text-align: center;
         }
         
+        .blog-hero-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+        
         .blog-title {
             font-size: 36px;
             font-weight: 800;
-            color: #ffffff;
+            color: #1a1a1a;
             margin-bottom: 24px;
             line-height: 1.2;
         }
@@ -89,8 +98,8 @@
         }
         
         .blog-tag {
-            background: rgba(74, 158, 255, 0.2);
-            color: #4a9eff;
+            background: rgba(0, 0, 0, 0.1);
+            color: #1a1a1a;
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 12px;
@@ -100,7 +109,7 @@
         
         .blog-content {
             font-size: 16px;
-            color: #cccccc;
+            color: #666666;
             line-height: 1.8;
         }
         
@@ -110,14 +119,14 @@
         
         .blog-content h2 {
             font-size: 24px;
-            color: #ffffff;
+            color: #1a1a1a;
             margin: 40px 0 20px 0;
             font-weight: 700;
         }
         
         .blog-content h3 {
             font-size: 20px;
-            color: #ffffff;
+            color: #1a1a1a;
             margin: 32px 0 16px 0;
             font-weight: 600;
         }
@@ -129,11 +138,11 @@
         
         .blog-content li {
             margin-bottom: 8px;
-            color: #cccccc;
+            color: #666666;
         }
         
         .blog-content blockquote {
-            border-left: 4px solid #4a9eff;
+            border-left: 4px solid #1a1a1a;
             padding-left: 20px;
             margin: 24px 0;
             font-style: italic;
@@ -146,22 +155,22 @@
         }
         
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.02);
             border-radius: 3px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: rgba(74, 158, 255, 0.3);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 3px;
             transition: background 0.3s ease;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(74, 158, 255, 0.5);
+            background: rgba(0, 0, 0, 0.2);
         }
         
         ::-webkit-scrollbar-thumb:active {
-            background: rgba(74, 158, 255, 0.7);
+            background: rgba(0, 0, 0, 0.3);
         }
         
         /* Hide scrollbar when not scrolling */
@@ -173,7 +182,7 @@
         .blog-footer {
             margin-top: 60px;
             padding: 20px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
             text-align: center;
             color: #888888;
             font-size: 12px;
@@ -186,13 +195,13 @@
         }
         
         .footer-link {
-            color: #4a9eff;
+            color: #1a1a1a;
             text-decoration: none;
             transition: color 0.3s ease;
         }
         
         .footer-link:hover {
-            color: #6ab7ff;
+            color: #666666;
         }
         
         /* Responsive */
@@ -236,6 +245,7 @@
                 <span class="blog-tag">Visual Thinking</span>
                 <span>5 min read</span>
             </div>
+            <img src="https://images.unsplash.com/photo-1518976024611-28bf4b48222e?q=80&w=985&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=800&h=400&fit=crop" alt="Organized thoughts and ideas" class="blog-hero-image">
         </div>
         
         <div class="blog-content">

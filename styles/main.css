@@ -8,8 +8,8 @@
 /* Only apply fixed positioning to index.html body */
 body.index-page {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #1e1e1e;
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #1a1a1a;
     height: 100vh;
     overflow: hidden;
     width: 100vw;
@@ -19,8 +19,8 @@ body.index-page {
 /* Default body styles for other pages */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #1e1e1e;
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #1a1a1a;
     height: 100vh;
     overflow: hidden;
 }
@@ -32,8 +32,8 @@ body {
     left: 50%;
     transform: translateX(-50%);
     height: 48px;
-    background-color: #2a2a2a;
-    border: 1px solid #3a3a3a;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -41,8 +41,8 @@ body {
     padding: 0 20px;
     z-index: 1000;
     backdrop-filter: blur(10px);
-    background-color: rgba(42, 42, 42, 0.95);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     min-width: auto;
     width: auto;
     gap: 16px;
@@ -83,7 +83,7 @@ body {
 .brand-name {
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff;
+    color: #1a1a1a;
 }
 
 /* Bar Center Section */
@@ -102,18 +102,19 @@ body {
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid rgba(0, 0, 0, 0.2);
     background-color: transparent;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #cccccc;
+    color: #666666;
 }
 
 .bar-center .action-btn-add:hover,
 .bar-center .action-btn-delete:hover {
-    border-color: #ffffff;
-    color: #ffffff;
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+    background-color: rgba(0, 0, 0, 0.05);
     transform: scale(1.02);
 }
 
@@ -162,24 +163,25 @@ body {
     justify-content: center;
     width: 28px;
     height: 28px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid rgba(0, 0, 0, 0.2);
     background-color: transparent;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #cccccc;
+    color: #666666;
 }
 
 .zoom-btn:hover {
-    border-color: #ffffff;
-    color: #ffffff;
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+    background-color: rgba(0, 0, 0, 0.05);
     transform: scale(1.02);
 }
 
 .zoom-level {
     font-size: 12px;
     font-weight: 500;
-    color: #cccccc;
+    color: #666666;
     min-width: 40px;
     text-align: center;
 }
@@ -198,7 +200,7 @@ body {
 }
 
 .instruction-text {
-    color: #888888;
+    color: #999999;
     padding: 4px 8px;
     font-size: 11px;
     font-weight: 400;
@@ -333,7 +335,7 @@ body {
 .canvas-area {
     width: 100%;
     height: 100%;
-    background-color: #1e1e1e;
+    background-color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,15 +343,7 @@ body {
 }
 
 .canvas-area::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: radial-gradient(circle, #2a2a2a 1px, transparent 1px);
-    background-size: 20px 20px;
-    opacity: 0.5;
+    display: none;
 }
 
 /* Responsive Design */
@@ -568,9 +562,10 @@ body {
     height: 150px;
     min-width: 120px;
     min-height: 120px;
-    background: var(--card-primary, #4472a6);
+    background: var(--card-primary, #4a9eff);
+    border: 2px solid var(--card-border, #d1dce8);
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     z-index: 1500;
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -581,7 +576,7 @@ body {
 }
 
 .resizable-card.selected-for-connection {
-    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.6);
+    border-width: 4px;
 }
 
 .canvas-area.connection-mode-active {
@@ -640,30 +635,30 @@ body {
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .resizable-card .color-dot {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(107, 114, 128, 0.8);
 }
 
 .resizable-card .delete-dot {
-    background: rgba(255, 74, 74, 0.9);
+    background: rgba(220, 38, 38, 0.9);
 }
 
 .resizable-card .control-dot:hover {
     transform: scale(1.2);
-    border-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.5);
 }
 
 .resizable-card .color-dot:hover {
-    background: #ffffff;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    background: rgba(75, 85, 99, 0.9);
+    box-shadow: 0 0 8px rgba(107, 114, 128, 0.4);
 }
 
 .resizable-card .delete-dot:hover {
-    background: #ff4a4a;
-    box-shadow: 0 0 8px rgba(255, 74, 74, 0.6);
+    background: rgba(185, 28, 28, 0.9);
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
 }
 
 /* Card Content */
@@ -678,7 +673,7 @@ body {
 .resizable-card .content-area {
     width: 100%;
     height: 100%;
-    color: var(--card-text, #ffffff);
+    color: #1a1a1a;
     font-size: 14px;
     line-height: 1.4;
     outline: none;
@@ -694,11 +689,11 @@ body {
 }
 
 .resizable-card .content-area:focus {
-    color: var(--card-text, #ffffff);
+    color: #1a1a1a;
 }
 
 .resizable-card .placeholder-text {
-    color: var(--card-text, #ffffff);
+    color: #1a1a1a;
     opacity: 0.6;
     font-style: italic;
     font-weight: 400;
@@ -838,5 +833,113 @@ min-height: 44px;
 .mobile-connection-btn {
 min-height: 44px;
 padding: 8px 12px;
+}
+}
+
+/* Game Container Styles */
+.game-container {
+position: fixed;
+bottom: 20px;
+right: 20px;
+width: 400px;
+height: 300px;
+background-color: #2a2a2a;
+border: 1px solid #3a3a3a;
+border-radius: 12px;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+z-index: 999;
+transition: all 0.3s ease;
+overflow: hidden;
+}
+
+.game-container.minimized {
+width: 200px;
+height: 60px;
+}
+
+.game-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px 16px;
+background-color: rgba(42, 42, 42, 0.95);
+border-bottom: 1px solid #3a3a3a;
+cursor: move;
+}
+
+.game-header h3 {
+margin: 0;
+font-size: 14px;
+font-weight: 600;
+color: #ffffff;
+}
+
+.game-toggle-btn {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 6px 12px;
+background-color: #3a3a3a;
+border: 1px solid #4a4a4a;
+border-radius: 6px;
+color: #ffffff;
+cursor: pointer;
+font-size: 12px;
+transition: all 0.2s ease;
+}
+
+.game-toggle-btn:hover {
+background-color: #4a4a4a;
+border-color: #5a5a5a;
+}
+
+.game-content {
+height: calc(100% - 60px);
+position: relative;
+background-color: #1e1e1e;
+}
+
+.game-container.minimized .game-content {
+display: none;
+}
+
+#game-canvas-container {
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+/* Game canvas styles */
+#game-canvas-container canvas {
+max-width: 100%;
+max-height: 100%;
+border-radius: 8px;
+}
+
+/* Game loading state */
+.game-loading {
+display: flex;
+align-items: center;
+justify-content: center;
+height: 100%;
+color: #888;
+font-size: 14px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+.game-container {
+position: fixed;
+bottom: 10px;
+right: 10px;
+left: 10px;
+width: auto;
+height: 250px;
+}
+
+.game-container.minimized {
+height: 60px;
 }
 }
